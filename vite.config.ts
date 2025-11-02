@@ -19,6 +19,6 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-      base: env.VITE_BASE_BASH || '/kim-ngan-van-son',
+      base: env.VITE_BASE_PATH || '/kim-ngan-van-son',
     };
 });
