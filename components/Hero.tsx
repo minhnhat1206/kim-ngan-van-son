@@ -6,13 +6,13 @@ const InvitationDetails: React.FC = () => {
       <div className="max-w-4xl mx-auto flex flex-col items-center text-center">
 
         {/* Opening */}
-        <div className="mb-10 sm:mb-14">
+        <div className="mb-8 sm:mb-12">
           <p className="font-serif-light text-xs sm:text-sm tracking-[0.25em] uppercase">
             NGÀY CHUNG ĐÔI
           </p>
 
           <h1
-            className="font-handwriting text-5xl sm:text-6xl md:text-7xl mt-2 mb-4 leading-tight"
+            className="font-handwriting text-4xl sm:text-5xl md:text-7xl mt-2 mb-3 leading-tight"
             style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.35)' }}
           >
             Kim Ngân - Văn Sơn
@@ -22,7 +22,7 @@ const InvitationDetails: React.FC = () => {
         </div>
 
         {/* Invitation text */}
-        <div className="max-w-lg">
+        <div className="max-w-lg mb-6">
           <p className="font-serif-light text-sm sm:text-base leading-relaxed">
             TRÂN TRỌNG KÍNH MỜI
           </p>
@@ -31,44 +31,65 @@ const InvitationDetails: React.FC = () => {
           </p>
         </div>
 
-        {/* Venue + date: force horizontal layout (mobile included) */}
-        <div className="mt-8 sm:mt-10 w-full flex flex-row flex-wrap items-center justify-between gap-4 text-center md:text-left">
-          {/* Venue (flex-1 so it can shrink/grow) */}
-          <div className="flex-1 min-w-0">
-            <h2 className="font-serif-display text-2xl sm:text-3xl md:text-4xl leading-snug">
-              TRUNG TÂM THANH <br className="sm:hidden" /> THIẾU NIÊN MIỀN NAM
-            </h2>
-            <p className="mt-3 text-xs sm:text-sm md:text-base font-serif-light opacity-90">
-              Số 1, Đường số 3, Khu dân cư Vĩnh Lộc, <br className="sm:hidden md:inline" />
-              Phường Bình Tân, TP. HCM
-            </p>
-          </div>
+        {/* --- IMPORTANT: Mobile = stacked (column); md+ = row (venue left, date right) --- */}
+        <div className="w-full">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
-          {/* Date block: compact on mobile, border-left only on md+ */}
-          <div className="flex-shrink-0 flex items-center">
-            <div className="md:border-l md:border-[#EDEDE8] md:pl-6 md:ml-6 pl-3">
-              <div className="text-lg sm:text-xl md:text-4xl font-serif-display leading-tight text-right min-w-[56px]">
-                <div className="leading-none">25</div>
-                <div className="leading-none">01</div>
-                <div className="leading-none">26</div>
+            {/* Venue: always a block that can wrap internally, but we add intentional mobile breaks */}
+            <div className="flex-1 min-w-0 text-center md:text-left">
+              <h2 className="font-serif-display text-2xl sm:text-3xl md:text-4xl leading-snug">
+                {/* explicit mobile break: show as 2 lines on small screens, single block on bigger */}
+                <span className="block md:inline">TRUNG TÂM THANH</span>
+                <span className="hidden md:inline"> </span>
+                <span className="block md:inline">THIẾU NIÊN MIỀN NAM</span>
+              </h2>
+
+              <p className="mt-3 text-xs sm:text-sm md:text-base font-serif-light opacity-90">
+                {/* keep address lines separate and forced breaks on mobile for readability */}
+                <span className="block">Số 1, Đường số 3, Khu dân cư Vĩnh Lộc,</span>
+                <span className="block">Phường Bình Tân, TP. HCM</span>
+              </p>
+            </div>
+
+            {/* Date: on mobile it will be its own block below venue; on md+ it appears to the right */}
+            <div className="flex-shrink-0 flex justify-center md:justify-end">
+              <div className="md:border-l md:border-[#EDEDE8] md:pl-6 md:ml-6 pl-0 mt-0 md:mt-0">
+                {/* large, fluid date; kept as block so it will be on its own line on mobile */}
+                <div
+                  className="font-serif-display leading-none text-center md:text-right"
+                  style={{
+                    fontSize: 'clamp(1.25rem, 8vw, 4.5rem)',
+                    lineHeight: 1,
+                    fontWeight: 500,
+                  }}
+                >
+                  <div style={{ marginBottom: '-0.12rem' }}>25</div>
+                  <div style={{ marginBottom: '-0.12rem' }}>01</div>
+                  <div>26</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Time / schedule: make separator visible on mobile and inline */}
-        <div className="mt-10 text-center">
-          <p className="text-base sm:text-lg font-serif-light">
-            VÀO LÚC 11:00, CHỦ NHẬT
-          </p>
-          <p className="text-xs sm:text-sm text-gray-200 mt-1 italic">
-            (Nhằm ngày 07 tháng 12 năm Ất Tỵ)
-          </p>
+        {/* Time / schedule: keep inline (no wrap). If too narrow, allow horizontal scroll */}
+        <div className="mt-8 w-full">
+          <div className="text-center">
+            <p className="text-base sm:text-lg font-serif-light">
+              VÀO LÚC 10:30, CHỦ NHẬT
+            </p>
+            <p className="text-xs sm:text-sm text-gray-200 mt-1 italic">
+              (Nhằm ngày 07 tháng 12 năm Ất Tỵ)
+            </p>
+          </div>
 
-          <div className="mt-4 flex flex-row flex-wrap items-center justify-center gap-3 text-xs sm:text-sm font-serif-light">
-            <span>ĐÓN KHÁCH 11:00</span>
-            <span className="mx-1">|</span>
-            <span>KHAI TIỆC 12:00</span>
+          <div className="mt-4 flex items-center justify-center">
+            {/* prevent wrapping with whitespace-nowrap; enable x-scroll if tiny screens */}
+            <div className="whitespace-nowrap text-xs sm:text-sm font-serif-light overflow-x-auto px-2">
+              <span className="inline-block">ĐÓN KHÁCH 10:30</span>
+              <span className="inline-block mx-2">|</span>
+              <span className="inline-block">KHAI TIỆC 12:00</span>
+            </div>
           </div>
         </div>
 
