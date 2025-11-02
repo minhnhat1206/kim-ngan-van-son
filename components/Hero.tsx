@@ -47,7 +47,7 @@ const InvitationDetails: React.FC = () => {
           {/* Date block: compact on mobile, border-left only on md+ */}
           <div className="flex-shrink-0 flex items-center">
             <div className="md:border-l md:border-[#EDEDE8] md:pl-6 md:ml-6 pl-3">
-              <div className="text-lg sm:text-xl md:text-3xl font-serif-display leading-tight text-right min-w-[56px]">
+              <div className="text-lg sm:text-xl md:text-4xl font-serif-display leading-tight text-right min-w-[56px]">
                 <div className="leading-none">25</div>
                 <div className="leading-none">01</div>
                 <div className="leading-none">26</div>

@@ -25,19 +25,43 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
     attendees: 1,
     notes: '',
   });
+  const [attendeesInput, setAttendeesInput] = useState<string>(String(formData.attendees)); // <-- local string state
   const [isLoading, setIsLoading] = useState(false);
   const { ref, isVisible } = useScrollAnimation<HTMLDivElement>();
 
+  // Keep attendeesInput in sync when attending toggles to NO (force '0') or YES with attendees value
   useEffect(() => {
     if (formData.attending === AttendingStatus.NO) {
       setFormData(prev => ({ ...prev, attendees: 0 }));
-    } else if (formData.attendees === 0 && formData.attending === AttendingStatus.YES) {
-      setFormData(prev => ({ ...prev, attendees: 1 }));
+      setAttendeesInput('0');
+    } else {
+      // when switching to YES, ensure at least 1
+      const at = formData.attendees && formData.attendees > 0 ? formData.attendees : 1;
+      setFormData(prev => ({ ...prev, attendees: at }));
+      setAttendeesInput(String(at));
     }
-  }, [formData.attending, formData.attendees]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.attending]);
+
+  // Ensure attendeesInput reflects external changes to formData.attendees (rare)
+  useEffect(() => {
+    setAttendeesInput(String(formData.attendees));
+  }, [formData.attendees]);
+
+  const normalizeAttendeesAndUpdate = (raw: string) => {
+    // parse, clamp 0..10, fallback default (1 if attending YES else 0)
+    const n = parseInt(raw, 10);
+    const fallback = formData.attending === AttendingStatus.YES ? 1 : 0;
+    const final = isNaN(n) ? fallback : Math.max(0, Math.min(10, n));
+    setFormData(prev => ({ ...prev, attendees: final }));
+    setAttendeesInput(String(final));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // make sure attendees string converts to proper number before submit
+    normalizeAttendeesAndUpdate(attendeesInput);
+
     setIsLoading(true);
 
     // Demo fallback if script not configured
@@ -138,7 +162,11 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, attending: AttendingStatus.YES })}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, attending: AttendingStatus.YES }));
+                  // ensure attendeesInput is at least '1'
+                  setAttendeesInput(prev => (parseInt(prev, 10) > 0 ? prev : '1'));
+                }}
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-base font-semibold transition-all duration-200
                   ${formData.attending === AttendingStatus.YES
                     ? 'bg-[#0F4D3A] text-white shadow'
@@ -152,7 +180,10 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
 
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, attending: AttendingStatus.NO })}
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, attending: AttendingStatus.NO, attendees: 0 }));
+                  setAttendeesInput('0');
+                }}
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-base font-semibold transition-all duration-200
                   ${formData.attending === AttendingStatus.NO
                     ? 'bg-white text-[#B74A3A] ring-2 ring-[#B74A3A] shadow'
@@ -170,15 +201,20 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
           <div className={`transition-opacity duration-300 ${formData.attending === AttendingStatus.NO ? 'opacity-50' : 'opacity-100'}`}>
             <label htmlFor="attendees" className="block text-sm font-medium text-[#0F4D3A]/90 mb-2">Số người tham dự</label>
 
-            {/* compact input + quick +/- on larger screens */}
+            {/* controlled via attendeesInput string so user can clear & type */}
             <div className="flex items-center gap-3">
               <input
                 id="attendees"
                 type="number"
+                inputMode="numeric"
                 min={formData.attending === AttendingStatus.YES ? 1 : 0}
                 max={10}
-                value={formData.attendees}
-                onChange={(e) => setFormData({ ...formData, attendees: parseInt(e.target.value, 10) || 0 })}
+                value={attendeesInput}
+                onChange={(e) => {
+                  // just update local string — do not coerce to number yet
+                  setAttendeesInput(e.target.value);
+                }}
+                onBlur={() => normalizeAttendeesAndUpdate(attendeesInput)}
                 disabled={formData.attending === AttendingStatus.NO}
                 className="w-full px-3 py-2 border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2] focus:border-[#A8D3C2] transition duration-150 text-[#0F4D3A] disabled:bg-gray-100"
               />
@@ -186,7 +222,12 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
               <div className="hidden sm:flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, attendees: Math.max(0, (prev.attendees || 0) - 1) }))}
+                  onClick={() => {
+                    const current = parseInt(attendeesInput || String(formData.attendees), 10) || 0;
+                    const next = Math.max(0, current - 1);
+                    setAttendeesInput(String(next));
+                    setFormData(prev => ({ ...prev, attendees: next }));
+                  }}
                   className="px-3 py-2 rounded-md border border-[#CFE8D8] hover:bg-[#F6F9F7]"
                   aria-label="Giảm"
                 >
@@ -194,7 +235,12 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, attendees: Math.min(10, (prev.attendees || 0) + 1) }))}
+                  onClick={() => {
+                    const current = parseInt(attendeesInput || String(formData.attendees), 10) || 0;
+                    const next = Math.min(10, current + 1);
+                    setAttendeesInput(String(next));
+                    setFormData(prev => ({ ...prev, attendees: next }));
+                  }}
                   className="px-3 py-2 rounded-md border border-[#CFE8D8] hover:bg-[#F6F9F7]"
                   aria-label="Tăng"
                 >
