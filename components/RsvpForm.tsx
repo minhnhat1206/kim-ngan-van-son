@@ -14,8 +14,8 @@ interface RsvpFormProps {
   onSubmit: (data: RsvpData) => void;
 }
 
-// IMPORTANT: Replace this with the Web app URL you get after deploying the Google Apps Script.
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwcV9_OubKPJPknDFS_CHJR4-YvAjawhWJBYh5xsKdO78F9reXcITfvL-8uBNUWyJFIXg/exec';
+const GOOGLE_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbwcV9_OubKPJPknDFS_CHJR4-YvAjawhWJBYh5xsKdO78F9reXcITfvL-8uBNUWyJFIXg/exec';
 
 const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<RsvpData>({
@@ -25,31 +25,26 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
     attendees: 1,
     notes: '',
   });
-  const [attendeesInput, setAttendeesInput] = useState<string>(String(formData.attendees)); // <-- local string state
+  const [attendeesInput, setAttendeesInput] = useState<string>(String(formData.attendees));
   const [isLoading, setIsLoading] = useState(false);
   const { ref, isVisible } = useScrollAnimation<HTMLDivElement>();
 
-  // Keep attendeesInput in sync when attending toggles to NO (force '0') or YES with attendees value
   useEffect(() => {
     if (formData.attending === AttendingStatus.NO) {
       setFormData(prev => ({ ...prev, attendees: 0 }));
       setAttendeesInput('0');
     } else {
-      // when switching to YES, ensure at least 1
       const at = formData.attendees && formData.attendees > 0 ? formData.attendees : 1;
       setFormData(prev => ({ ...prev, attendees: at }));
       setAttendeesInput(String(at));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.attending]);
 
-  // Ensure attendeesInput reflects external changes to formData.attendees (rare)
   useEffect(() => {
     setAttendeesInput(String(formData.attendees));
   }, [formData.attendees]);
 
   const normalizeAttendeesAndUpdate = (raw: string) => {
-    // parse, clamp 0..10, fallback default (1 if attending YES else 0)
     const n = parseInt(raw, 10);
     const fallback = formData.attending === AttendingStatus.YES ? 1 : 0;
     const final = isNaN(n) ? fallback : Math.max(0, Math.min(10, n));
@@ -59,19 +54,8 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // make sure attendees string converts to proper number before submit
     normalizeAttendeesAndUpdate(attendeesInput);
-
     setIsLoading(true);
-
-    // Demo fallback if script not configured
-    if (GOOGLE_SCRIPT_URL.includes('YOUR_SCRIPT_ID')) {
-      setTimeout(() => {
-        setIsLoading(false);
-        onSubmit(formData);
-      }, 1500);
-      return;
-    }
 
     const scriptFormData = new FormData();
     scriptFormData.append('Timestamp', new Date().toISOString());
@@ -86,65 +70,66 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
         method: 'POST',
         body: scriptFormData,
       });
-
       if (response.ok) {
         onSubmit(formData);
       } else {
-        const errorText = await response.text();
-        console.error('Google Script submission failed:', response.status, errorText);
-        alert('Không thể gửi phản hồi do lỗi từ máy chủ. Vui lòng thử lại.');
+        alert('Không thể gửi phản hồi do lỗi máy chủ.');
       }
     } catch (error) {
-      console.error('Error submitting RSVP:', error);
-      alert('Đã có lỗi xảy ra khi gửi phản hồi. Vui lòng kiểm tra kết nối mạng và thử lại.');
+      alert('Đã có lỗi khi gửi phản hồi. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const guestGroupOptions = [
-    { value: GuestGroup.BRIDE_FAMILY, icon: <BrideFamilyIcon className="w-7 h-7 mx-auto mb-2 text-[#0F4D3A]" /> },
-    { value: GuestGroup.BRIDE_FRIEND, icon: <BrideFriendIcon className="w-7 h-7 mx-auto mb-2 text-[#0F4D3A]" /> },
-    { value: GuestGroup.GROOM_FRIEND, icon: <GroomFriendIcon className="w-7 h-7 mx-auto mb-2 text-[#0F4D3A]" /> },
+    { value: GuestGroup.BRIDE_FAMILY, icon: <BrideFamilyIcon className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 text-[#0F4D3A]" /> },
+    { value: GuestGroup.BRIDE_FRIEND, icon: <BrideFriendIcon className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 text-[#0F4D3A]" /> },
+    { value: GuestGroup.GROOM_FRIEND, icon: <GroomFriendIcon className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 text-[#0F4D3A]" /> },
   ];
 
   return (
     <div
       ref={ref}
-      className={`bg-[#FAF9F7] py-10 px-4 sm:py-14 sm:px-6 transition-all duration-1000 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+      className={`bg-[#FAF9F7] py-10 px-4 sm:py-16 sm:px-10 md:px-20 transition-all duration-1000 ease-out ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}
     >
-      <div className="max-w-lg mx-auto p-6 sm:p-8 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl sm:text-3xl text-center font-handwriting text-[#0F4D3A] mb-6">Xác nhận tham dự</h2>
+      <div className="max-w-2xl md:max-w-3xl mx-auto p-6 sm:p-10 md:p-12 bg-white rounded-2xl shadow-2xl border border-[#E6EEE8]">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl text-center font-handwriting text-[#0F4D3A] mb-8 md:mb-10 font-semibold tracking-wide">
+          Xác nhận tham dự
+        </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 text-[#0F4D3A]">
           {/* Guest Group */}
           <div>
-            <label className="block text-sm font-medium text-[#0F4D3A] mb-3 text-center">Quý khách thuộc nhóm nào?</label>
-
-            {/* stacked on mobile (1 column), grid on sm+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <label className="block text-base md:text-lg font-medium mb-3 text-center">
+              Quý khách thuộc nhóm nào?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {guestGroupOptions.map(opt => (
                 <button
                   type="button"
                   key={opt.value}
                   onClick={() => setFormData({ ...formData, guestGroup: opt.value })}
-                  aria-pressed={formData.guestGroup === opt.value}
-                  className={`flex flex-col items-center justify-center p-3 rounded-lg text-center border-2 transition-all duration-200
-                    ${formData.guestGroup === opt.value
-                      ? 'border-[#B74A3A] bg-[#B74A3A]/10 scale-105 shadow'
-                      : 'border-[#CFE8D8] bg-white hover:border-[#A8D3C2] hover:bg-[#A8D3C2]/10'}
-                  `}
+                  className={`flex flex-col items-center justify-center p-4 rounded-xl text-center border-2 transition-all duration-200 md:text-lg font-medium ${
+                    formData.guestGroup === opt.value
+                      ? 'border-[#B74A3A] bg-[#B74A3A]/10 scale-105 shadow-lg'
+                      : 'border-[#CFE8D8] bg-white hover:border-[#A8D3C2] hover:bg-[#A8D3C2]/10'
+                  }`}
                 >
                   {opt.icon}
-                  <span className="text-xs sm:text-sm text-[#0F4D3A] font-serif-light">{opt.value}</span>
+                  <span className="text-sm md:text-base">{opt.value}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Guest Name */}
+          {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-[#0F4D3A]/90 mb-2">Tên khách mời</label>
+            <label htmlFor="name" className="block text-base md:text-lg font-medium mb-2">
+              Tên khách mời
+            </label>
             <input
               id="name"
               type="text"
@@ -152,30 +137,29 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="VD: Nguyễn Thị Hoa"
               required
-              className="w-full px-3 py-2 border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2] focus:border-[#A8D3C2] transition duration-150 text-[#0F4D3A]"
+              className="w-full px-4 py-3 md:py-4 text-base md:text-lg border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2]"
             />
           </div>
 
           {/* Attending */}
           <div>
-            <label className="block text-sm font-medium text-[#0F4D3A]/90 mb-2">Quý khách có tham dự?</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label className="block text-base md:text-lg font-medium mb-2">
+              Quý khách có tham dự?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => {
                   setFormData(prev => ({ ...prev, attending: AttendingStatus.YES }));
-                  // ensure attendeesInput is at least '1'
                   setAttendeesInput(prev => (parseInt(prev, 10) > 0 ? prev : '1'));
                 }}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-base font-semibold transition-all duration-200
-                  ${formData.attending === AttendingStatus.YES
-                    ? 'bg-[#0F4D3A] text-white shadow'
-                    : 'bg-[#CFE8D8] text-[#0F4D3A] hover:bg-[#A8D3C2]'}
-                `}
-                aria-pressed={formData.attending === AttendingStatus.YES}
+                className={`flex items-center justify-center gap-2 px-6 py-3 md:py-4 rounded-lg text-base md:text-lg font-semibold transition-all duration-200 ${
+                  formData.attending === AttendingStatus.YES
+                    ? 'bg-[#0F4D3A] text-white shadow-md'
+                    : 'bg-[#CFE8D8] text-[#0F4D3A] hover:bg-[#A8D3C2]'
+                }`}
               >
-                <CheckIcon className="w-5 h-5" />
-                {AttendingStatus.YES}
+                <CheckIcon className="w-6 h-6" /> {AttendingStatus.YES}
               </button>
 
               <button
@@ -184,81 +168,48 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
                   setFormData(prev => ({ ...prev, attending: AttendingStatus.NO, attendees: 0 }));
                   setAttendeesInput('0');
                 }}
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-base font-semibold transition-all duration-200
-                  ${formData.attending === AttendingStatus.NO
-                    ? 'bg-white text-[#B74A3A] ring-2 ring-[#B74A3A] shadow'
-                    : 'bg-white text-[#B74A3A]/90 ring-1 ring-[#B74A3A]/30 hover:ring-[#B74A3A]'}
-                `}
-                aria-pressed={formData.attending === AttendingStatus.NO}
+                className={`flex items-center justify-center gap-2 px-6 py-3 md:py-4 rounded-lg text-base md:text-lg font-semibold transition-all duration-200 ${
+                  formData.attending === AttendingStatus.NO
+                    ? 'bg-white text-[#B74A3A] ring-2 ring-[#B74A3A] shadow-md'
+                    : 'bg-white text-[#B74A3A]/90 ring-1 ring-[#B74A3A]/30 hover:ring-[#B74A3A]'
+                }`}
               >
-                <SadIcon className="w-5 h-5" />
-                {AttendingStatus.NO}
+                <SadIcon className="w-6 h-6" /> {AttendingStatus.NO}
               </button>
             </div>
           </div>
 
-          {/* Number of Attendees */}
+          {/* Attendees */}
           <div className={`transition-opacity duration-300 ${formData.attending === AttendingStatus.NO ? 'opacity-50' : 'opacity-100'}`}>
-            <label htmlFor="attendees" className="block text-sm font-medium text-[#0F4D3A]/90 mb-2">Số người tham dự</label>
-
-            {/* controlled via attendeesInput string so user can clear & type */}
+            <label htmlFor="attendees" className="block text-base md:text-lg font-medium mb-2">
+              Số người tham dự
+            </label>
             <div className="flex items-center gap-3">
               <input
                 id="attendees"
                 type="number"
-                inputMode="numeric"
                 min={formData.attending === AttendingStatus.YES ? 1 : 0}
                 max={10}
                 value={attendeesInput}
-                onChange={(e) => {
-                  // just update local string — do not coerce to number yet
-                  setAttendeesInput(e.target.value);
-                }}
+                onChange={(e) => setAttendeesInput(e.target.value)}
                 onBlur={() => normalizeAttendeesAndUpdate(attendeesInput)}
                 disabled={formData.attending === AttendingStatus.NO}
-                className="w-full px-3 py-2 border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2] focus:border-[#A8D3C2] transition duration-150 text-[#0F4D3A] disabled:bg-gray-100"
+                className="w-full px-4 py-3 md:py-4 text-base md:text-lg border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2] disabled:bg-gray-100"
               />
-              {/* optional quick buttons (visible on sm+) */}
-              <div className="hidden sm:flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const current = parseInt(attendeesInput || String(formData.attendees), 10) || 0;
-                    const next = Math.max(0, current - 1);
-                    setAttendeesInput(String(next));
-                    setFormData(prev => ({ ...prev, attendees: next }));
-                  }}
-                  className="px-3 py-2 rounded-md border border-[#CFE8D8] hover:bg-[#F6F9F7]"
-                  aria-label="Giảm"
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const current = parseInt(attendeesInput || String(formData.attendees), 10) || 0;
-                    const next = Math.min(10, current + 1);
-                    setAttendeesInput(String(next));
-                    setFormData(prev => ({ ...prev, attendees: next }));
-                  }}
-                  className="px-3 py-2 rounded-md border border-[#CFE8D8] hover:bg-[#F6F9F7]"
-                  aria-label="Tăng"
-                >
-                  +
-                </button>
-              </div>
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-[#0F4D3A]/90 mb-2">Ghi chú (ăn chay, yêu cầu chỗ ngồi...)</label>
+            <label htmlFor="notes" className="block text-base md:text-lg font-medium mb-2">
+              Ghi chú (ăn chay, yêu cầu chỗ ngồi...)
+            </label>
             <textarea
               id="notes"
               rows={3}
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3 py-2 border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2] focus:border-[#A8D3C2] transition duration-150 text-[#0F4D3A]"
+              className="w-full px-4 py-3 md:py-4 text-base md:text-lg border border-[#CFE8D8] rounded-md focus:ring-2 focus:ring-[#A8D3C2]"
             />
           </div>
 
@@ -267,11 +218,11 @@ const RsvpForm: React.FC<RsvpFormProps> = ({ onSubmit }) => {
             <button
               type="submit"
               disabled={isLoading || !formData.guestGroup || !formData.name || !formData.attending}
-              className="w-full flex justify-center items-center gap-3 px-4 py-3 text-lg font-bold text-white bg-[#0F4D3A] rounded-full hover:bg-[#A8D3C2] focus:outline-none focus:ring-4 focus:ring-[#A8D3C2]/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center items-center gap-3 px-6 py-3 md:py-4 text-lg md:text-xl font-bold text-white bg-[#0F4D3A] rounded-full hover:bg-[#A8D3C2] focus:ring-4 focus:ring-[#A8D3C2]/30 transition-all duration-200 disabled:opacity-50"
             >
               {isLoading ? (
                 <>
-                  <LoadingFlowerIcon className="w-6 h-6" />
+                  <LoadingFlowerIcon className="w-6 h-6 md:w-7 md:h-7" />
                   Đang gửi...
                 </>
               ) : (

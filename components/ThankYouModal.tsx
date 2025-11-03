@@ -63,7 +63,7 @@ const ThankYouModal: React.FC<ThankYouModalProps> = ({ isOpen, onClose }) => {
             Phản hồi của Quý khách đã được ghi nhận.
           </p>
           <p className="text-lg font-medium">
-            Gia đình chúng con/em/tôi rất mong được đón tiếp Quý khách vào ngày 28.01.2026.
+            Gia đình chúng con/em/tôi rất mong được đón tiếp Quý khách vào ngày 25.01.2026.
           </p>
           <button
             onClick={onClose}

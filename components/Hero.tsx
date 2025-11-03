@@ -11,29 +11,33 @@ const InvitationDetails: React.FC = () => {
             NGÀY CHUNG ĐÔI
           </p>
 
+          {/* Tiêu đề tự co chữ khi màn hình nhỏ */}
           <h1
-            className="font-['Great_Vibes'] text-6xl sm:text-7xl md:text-8xl mt-2 mb-4 leading-tight"
+            className="font-['Great_Vibes'] text-5xl sm:text-7xl md:text-8xl mt-2 mb-4 leading-tight whitespace-nowrap scale-95 sm:scale-100"
             style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.35)' }}
           >
             Kim Ngân - Văn Sơn
           </h1>
 
-          <div className="w-16 h-[2px] bg-[#EDEDE8] mx-auto" />
         </div>
 
         {/* Invitation text */}
         <div className="max-w-lg text-center leading-relaxed mb-6">
-          <p className="text-base sm:text-lg font-light">TRÂN TRỌNG KÍNH MỜI</p>
-          <p className="text-base sm:text-lg font-light mt-1">
-            ĐẾN DỰ BUỔI TIỆC CHUNG VUI CÙNG <br />
+          <p className="text-base sm:text-lg font-light tracking-wide">
+            TRÂN TRỌNG KÍNH MỜI
+          </p>
+          <div className="w-10 sm:w-12 h-[1.5px] bg-[#EDEDE8]/80 mx-auto mt-2 mb-3" />
+          <p className="text-base sm:text-lg font-light mt-1 leading-relaxed">
+            ĐẾN DỰ BUỔI TIỆC CHUNG VUI CÙNG <br className="hidden sm:block" />
             GIA ĐÌNH CHÚNG TÔI TẠI
           </p>
+
         </div>
 
-        {/* Venue + Date */}
-        <div className="mt-8 sm:mt-10 w-full flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+        {/* Venue + Date (giữ cùng hàng ở mobile luôn) */}
+        <div className="mt-8 sm:mt-10 w-full flex flex-row flex-wrap items-center justify-center gap-6 md:gap-10 text-center md:text-left">
           {/* Venue */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-[220px]">
             <h2 className="text-2xl sm:text-3xl md:text-4xl leading-snug font-semibold">
               TRUNG TÂM THANH <br className="sm:hidden" /> THIẾU NIÊN MIỀN NAM
             </h2>
@@ -44,11 +48,12 @@ const InvitationDetails: React.FC = () => {
           </div>
 
           {/* Date */}
-          <div className="flex items-center justify-center md:border-l md:border-[#EDEDE8] md:pl-8 md:ml-8">
-            <div className="font-['DM_Serif_Display'] text-3xl sm:text-4xl md:text-5xl font-semibold tracking-wider">
-              25 <span className="mx-2">•</span> 01 <span className="mx-2">•</span> 26
+          <div className="flex items-center justify-center border-l border-[#EDEDE8] pl-4 md:pl-6">
+            <div className="font-['DM_Serif_Display'] text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-none">
+              25 <span className="mx-[3px]">•</span> 01 <span className="mx-[3px]">•</span> 26
             </div>
           </div>
+
         </div>
 
         {/* Time / schedule */}

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,7 +20,7 @@
       .font-serif-light {
         font-family: 'Cormorant Garamond', serif;
       }
-       /* Custom scrollbar for a more elegant look */
+        /* Custom scrollbar for a more elegant look */
       ::-webkit-scrollbar {
         width: 8px;
       }
@@ -37,7 +36,13 @@
         background-color: #0F4D3A;
       }
     </style>
-  <script type="importmap">
+
+    <audio id="background-music" loop>
+        <source src="/sound/van_vat_nhu_muon_ta_ben_nhau.mp3" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ phần tử audio.
+    </audio>
+
+    <script type="importmap">
 {
   "imports": {
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
@@ -51,5 +56,24 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    
+    <script>
+        const music = document.getElementById('background-music');
+
+        function playMusic() {
+            // Cố gắng phát nhạc. Hàm .play() chỉ được phép gọi sau tương tác của người dùng.
+            music.play().catch(error => {
+                console.log("Tự động phát nhạc thất bại, cần tương tác của người dùng.");
+            });
+            
+            // Xóa bộ lắng nghe sự kiện sau khi đã cố gắng phát nhạc lần đầu
+            document.removeEventListener('click', playMusic);
+            document.removeEventListener('touchstart', playMusic);
+        }
+
+        // Lắng nghe sự kiện click hoặc chạm đầu tiên trên toàn bộ trang
+        document.addEventListener('click', playMusic);
+        document.addEventListener('touchstart', playMusic);
+    </script>
   </body>
 </html>
