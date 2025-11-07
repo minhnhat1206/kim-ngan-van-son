@@ -49,8 +49,8 @@ const InvitationDetails: React.FC = () => {
 
           {/* Date */}
           <div className="flex items-center justify-center border-l border-[#EDEDE8] pl-4 md:pl-6">
-            <div className="font-['DM_Serif_Display'] text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight leading-none">
-              25 <span className="mx-[3px]">•</span> 01 <span className="mx-[3px]">•</span> 26
+            <div className="font-['DM_Serif_Display'] text-2xl sm:text-4xl md:text-4xl font-semibold tracking-tight leading-none">
+              25 <span className="mx-[3px]">•</span> 01 <span className="mx-[3px]">•</span> 2026
             </div>
           </div>
 
@@ -59,14 +59,14 @@ const InvitationDetails: React.FC = () => {
         {/* Time / schedule */}
         <div className="mt-10 text-center">
           <p className="text-lg sm:text-xl font-medium">
-            VÀO LÚC 11:00, CHỦ NHẬT
+            VÀO LÚC 10:30, CHỦ NHẬT
           </p>
           <p className="text-sm sm:text-base text-gray-200 mt-1 italic">
             (Nhằm ngày 07 tháng 12 năm Ất Tỵ)
           </p>
 
           <div className="mt-4 flex flex-row flex-wrap items-center justify-center gap-3 text-sm sm:text-base font-light">
-            <span>ĐÓN KHÁCH 11:00</span>
+            <span>ĐÓN KHÁCH 10:30</span>
             <span className="mx-1">|</span>
             <span>KHAI TIỆC 12:00</span>
           </div>
